@@ -1,0 +1,44 @@
+name: Cloud Usage Assessment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  assess_usage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build and run Docker containers
+        run: docker-compose up -d
+
+      - name: Perform Health Check
+        run: |
+          curl --fail http://localhost:8080/health || exit 1
+
+      - name: Download Dataset
+        run: |
+          curl --fail http://localhost:8080/v1/dataset -o dataset.json
+
+      - name: Process Data
+        run: |
+          python process_data.py
+
+      - name: Submit Results
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d @results.json http://localhost:8080/v1/result
+
+      - name: Clean up
+        run: docker-compose down
