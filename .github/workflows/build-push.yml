@@ -1,63 +1,31 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Build and Push Image to DockerHub
-
-# TODOS: 
-# - Add DOCKER_USERNAME and DOCKER_PASSWORD to your repostitory secrets!
-# - Replace env.YOUR_COMPONENT with the component you will build one of {books, reviews, details}
-
-env:
-  COMPONENT: books
+name: Build and Push
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
+    branches:
+      - main
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: build
-        build-root-directory: ./${{ env.COMPONENT }}
-        
-    - name: Docker Login
-      uses: docker/login-action@v2.1.0
-      with:
-        username: ${{secrets.DOCKER_USERNAME}}
-        password: ${{secrets.DOCKER_PASSWORD}}
+      - uses: actions/checkout@v2
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      
-    - name: Build and push Docker images
-      uses: docker/build-push-action@v4.0.0
-      with:
-        tags: ${{secrets.DOCKER_USERNAME}}/bookstore-${{ env.COMPONENT }}:${{github.run_number}}
-        context: ./${{ env.COMPONENT }}
-        platforms: linux/amd64,linux/arm64/v8
-        push: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and push Books image
+        run: docker build -t username/books:latest ./Books
+
+      - name: Build and push Reviews image
+        run: docker build -t username/reviews:latest ./reviews
+
+      - name: Build and push Details image
+        run: docker build -t username/details:latest ./details
+
+      - name: Push to Docker Hub
+        run: docker push username/books:latest && docker push username/reviews:latest && docker push username/details:latest
