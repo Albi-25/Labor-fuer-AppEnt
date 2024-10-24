@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The {@code ApiClient} class is responsible for fetching a dataset from a REST API
+ * The {@code ApiClient} class is for fetching a dataset from a REST API
  * and using a {@code RuntimeCalculator} to process and calculate runtimes based on
  * the retrieved data.
  */
@@ -58,14 +58,14 @@ public class ApiClient {
     }
 
     /**
-     * Sends the runtime results to the specified POST URL.
+     * Sends the runtime results to the specified post-url
      *
-     * @param runtimes a map containing customer IDs and their total runtimes.
+     * @param runtimes a map containing customer id and their total runtimes
      */
     public void sendResults(Map<String, Long> runtimes) {
         try {
             Gson gson = new Gson();
-            // Create a structure that matches the expected format
+            // Create a structure that match the expected format
             Map<String, Object> requestBody = new HashMap<>();
             List<Map<String, Object>> resultsList = new ArrayList<>();
             for (Map.Entry<String, Long> entry : runtimes.entrySet()) {
@@ -74,8 +74,8 @@ public class ApiClient {
                 resultEntry.put("consumption", entry.getValue());
                 resultsList.add(resultEntry);
             }
-            requestBody.put("result", resultsList); // Wrap the list in a map with key "result"
-            // Convert the request body to JSON
+            requestBody.put("result", resultsList);
+            // Convert the request body to json
             String json = gson.toJson(requestBody);
             HttpRequest request = HttpRequest.newBuilder()
                                              .uri(URI.create(POST_URL))
