@@ -15,7 +15,7 @@ public class BookController {
     public List<Book> getAllBooks() {
         return Arrays.asList(
                 new Book(1, "Martin Kleppmann", "Designing Data-Intensive Applications"),
-                new Book(2, "Max C. Martin", "Code"),
+                new Book(2, "Max C", "Code"),
                 new Book(3, "Jonas J", "Java")
         );
     }
