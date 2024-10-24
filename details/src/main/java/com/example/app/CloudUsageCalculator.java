@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class CloudUsageCalculator {
 
-    // Step 1: Fetch event data (GET request)
+    // Step 1: Fetch event data
     public JSONArray fetchEventData() {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8080/v1/dataset";
@@ -93,6 +93,6 @@ public class CloudUsageCalculator {
         // Step 3: Send the results
         calculator.sendResults(totalUsageByCustomer);
 
-        System.out.println("Leistungsnachweis calculation and submission completed.");
+        System.out.println("Leistungsnachweis and submission completed.");
     }
 }
